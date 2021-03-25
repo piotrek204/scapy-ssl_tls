@@ -1,5 +1,10 @@
 # -*- coding: utf-8 -*-
 
+from __future__ import division
+from builtins import str
+from past.builtins import basestring
+from builtins import object
+from past.utils import old_div
 import binascii
 import math
 import random
@@ -78,7 +83,7 @@ def int_to_vector(num, fmt="!H"):
 def str_to_int(str_):
     if str_ == "":
         return 0
-    return int(binascii.hexlify(str_), 16)
+    return int(binascii.hexlify(str_.encode()), 16)
 
 
 def ansi_str_to_point(str_):

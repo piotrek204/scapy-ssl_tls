@@ -2,11 +2,15 @@
 # -*- coding: UTF-8 -*-
 # Author : <github.com/tintinweb/scapy-ssl_tls>
 
+from __future__ import absolute_import
+from __future__ import division
+from builtins import str
+from past.utils import old_div
 import socket
 import functools
 
-from ssl_tls import *
-from ssl_tls_crypto import *
+from .ssl_tls import *
+from .ssl_tls_crypto import *
 
 from scapy.automaton import Automaton, ATMT
 
@@ -364,7 +368,7 @@ class TLSServerAutomata(Automaton):
         self.peer = None
 
         pemo = pem_get_objects(self.pemcert)
-        for key_pk in (k for k in pemo.keys() if "CERTIFICATE" in k.upper()):
+        for key_pk in (k for k in list(pemo.keys()) if "CERTIFICATE" in k.upper()):
             self.dercert = ''.join(
                 line for line in pemo[key_pk].get("full").strip().split("\n") if not "-" in line).decode("base64")
             break
@@ -404,7 +408,7 @@ class TLSServerAutomata(Automaton):
         self.srv_tls_sock.listen(1)
 
         pemo = pem_get_objects(self.pemkey)
-        for key_pk in (k for k in pemo.keys() if "PRIVATE" in k.upper()):
+        for key_pk in (k for k in list(pemo.keys()) if "PRIVATE" in k.upper()):
             self.srv_tls_sock.tls_ctx.server_ctx.asym_keystore = tlsk.RSAKeystore.from_private(pemo[key_pk].get("full"))
             break
 

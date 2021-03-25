@@ -3,6 +3,11 @@
 # Author : <github.com/tintinweb/scapy-ssl_tls>
 
 from __future__ import division
+from __future__ import absolute_import
+from builtins import str
+from builtins import chr
+from builtins import range
+from builtins import object
 import binascii
 import copy
 import os
@@ -13,9 +18,9 @@ import warnings
 
 import math
 
-import pkcs7
-import ssl_tls as tls
-import ssl_tls_keystore as tlsk
+from . import pkcs7
+from . import ssl_tls as tls
+from . import ssl_tls_keystore as tlsk
 import tinyec.ec as ec
 import tinyec.registry as ec_reg
 
@@ -88,7 +93,7 @@ class TLSContext(object):
         with open(key_file, "r") as f:
             # _rsa_load_keys expects one pem/der key per file.
             pemo = pem_get_objects(f.read())
-            for key_pk in (k for k in pemo.keys() if "PRIVATE" in k.upper()):
+            for key_pk in (k for k in list(pemo.keys()) if "PRIVATE" in k.upper()):
                 try:
                     self.asym_keystore = tlsk.RSAKeystore.from_private(pemo[key_pk].get("full"))
                     return
@@ -716,7 +721,7 @@ class TLSPRF(object):
     TLS_MD_MASTER_SECRET_CONST = "master secret"
 
     def __init__(self, tls_version, digest=None):
-        if tls_version not in tls.TLS_VERSIONS.keys():
+        if tls_version not in list(tls.TLS_VERSIONS.keys()):
             raise ValueError("Unknown TLS version: %d" % tls_version)
         self.tls_version = tls_version
         if self.tls_version < tls.TLSVersion.TLS_1_2 and digest is not None:

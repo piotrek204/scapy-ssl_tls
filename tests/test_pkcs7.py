@@ -1,5 +1,7 @@
 #! -*- coding: utf-8 -*-
 
+from builtins import chr
+from builtins import range
 import unittest
 import scapy_ssl_tls.pkcs7 as pkcs7
 
@@ -25,7 +27,7 @@ class TestPKCS7Encoder(unittest.TestCase):
 
     def test_pkcs7_encode_decode(self):
         data = 'X'
-        for length in xrange(self.pkcs7.k * 2 + 1):
+        for length in range(self.pkcs7.k * 2 + 1):
             pkcs7_data = self.pkcs7.encode(data * length)
             self.assertEqual(len(pkcs7_data) % self.pkcs7.k, 0)
             self.assertEqual(self.pkcs7.decode(pkcs7_data), data * length)

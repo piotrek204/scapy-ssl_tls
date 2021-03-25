@@ -2,8 +2,12 @@
 # -*- coding: UTF-8 -*-
 # Author : janglin <http://japrogbits.blogspot.co.at>
 # http://japrogbits.blogspot.co.at/2011/02/using-encrypted-data-between-python-and.html
+from future import standard_library
+standard_library.install_aliases()
+from builtins import range
+from builtins import object
 import binascii
-import StringIO
+from io import StringIO
 
 
 class PKCS7Encoder(object):
@@ -47,20 +51,15 @@ class PKCS7Encoder(object):
         if val > self.k:
             raise ValueError('Input is not padded or padding is corrupt')
 
-        l = nl - val
-        return text[:l]
 
     # @param text The text to encode.
     def encode(self, text):
         """
         Pad an input string according to PKCS#7
         """
-        return text + self.get_padding(text)
+        return bytes(text).decode() + self.get_padding(text)
 
-    def get_padding(self, text):
-        l = len(text)
-        output = StringIO.StringIO()
+    def get_padding(self, bytestring):
+        l = len(bytestring)
         val = self.k - (l % self.k)
-        for _ in xrange(val):
-            output.write('%02x' % val)
-        return binascii.unhexlify(output.getvalue())
+        return (bytearray([val] * val)).decode()

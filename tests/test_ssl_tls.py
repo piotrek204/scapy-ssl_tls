@@ -1,5 +1,10 @@
 #! -*- coding: utf-8 -*-
 
+from __future__ import division
+from builtins import str
+from builtins import chr
+from builtins import range
+from past.utils import old_div
 import binascii
 import os
 import re
@@ -463,11 +468,12 @@ class TestKeyExchange(unittest.TestCase):
     def test_when_client_key_exchange_is_dh_then_it_is_dissected_correctly(self):
         tls_ctx = tlsc.TLSSessionCtx()
         tls_ctx.negotiated.key_exchange = tls.TLSKexNames.DHE
-        record = tls.TLSRecord(ctx=tls_ctx) / tls.TLSHandshakes(handshakes=[tls.TLSHandshake() / tls.TLSClientKeyExchange() /
-                                                                                                 tls.TLSClientDHParams(data="3456")])
+        record = tls.TLSRecord(ctx=tls_ctx) / tls.TLSHandshakes(
+            handshakes=[tls.TLSHandshake() / tls.TLSClientKeyExchange() / tls.TLSClientDHParams(data="3456")])
+
         self.assertTrue(record.haslayer(tls.TLSClientKeyExchange))
         self.assertTrue(record.haslayer(tls.TLSClientDHParams))
-        record = tls.TLSRecord(str(record), ctx=tls_ctx)
+        record = tls.TLSRecord(record.build(), ctx=tls_ctx)
         self.assertTrue(record.haslayer(tls.TLSClientKeyExchange))
         self.assertTrue(record.haslayer(tls.TLSClientDHParams))
         self.assertEqual(record[tls.TLSClientDHParams].data, "3456")
@@ -611,7 +617,7 @@ class TestPCAP(unittest.TestCase):
                 tls.TLSCiphertext].data,
             '%\xb8X\xc1\xa6?\xf8\xbd\xe6\xae\xbd\x98\xd4u\xa5E\x1b\xd8jpy\x86)NOd\xba\xe7\x1f\xcaK\x96\x9b\xf7\x0bP\xf5O\xfd\xda\xda\xcd\xcdK\x12.\xdf\xd5')
         # some more encrypted traffic
-        for _ in xrange(6):
+        for _ in range(6):
             # Application data - encrypted - 6 times
             record = pkts.pop()
             self.assertTrue(record.haslayer(tls.TLSRecord))
@@ -734,7 +740,7 @@ xVgf/Neb/avXgIgi6drj8dp1fWA=
             self.assertEqual(crypto_container.crypto_data.data, "\x14\x00\x00\x0c%s" % self.tls_ctx.get_verify_data())
             self.assertEqual(len(crypto_container.mac), SHA.digest_size)
             self.assertEqual(len(crypto_container.padding), 11)
-            self.assertTrue(all(map(lambda x: True if x == chr(11) else False, crypto_container.padding)))
+            self.assertTrue(all([True if x == chr(11) else False for x in crypto_container.padding]))
             return "A" * 48
 
         client_finished = tls.TLSRecord(content_type=0x16) / tls.to_raw(tls.TLSHandshakes(handshakes=[tls.TLSHandshake() /
