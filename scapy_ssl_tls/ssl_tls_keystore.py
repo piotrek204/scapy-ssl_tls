@@ -44,7 +44,7 @@ def rsa_public_from_der_certificate(certificate):
     for seq in tbs_certificate:
         if not isinstance(seq, basestring):
             continue     # skip numerics and non sequence stuff
-        if "\x2A\x86\x48\x86\xF7\x0D\x01\x01\x01" in seq:
+        if b"\x2A\x86\x48\x86\xF7\x0D\x01\x01\x01" in seq:
             subject_public_key_info = seq
 
     if subject_public_key_info is None:
@@ -71,8 +71,8 @@ def nb_bits(int_):
 
 
 def int_to_str(int_):
-    hex_ = "%x" % int_
-    return binascii.unhexlify("%s%s" % ("" if len(hex_) % 2 == 0 else "0", hex_))
+    hex_ = b"%x" % int_
+    return binascii.unhexlify(b"%s%s" % (b"" if len(hex_) % 2 == 0 else b"0", hex_))
 
 
 def int_to_vector(num, fmt="!H"):
@@ -80,14 +80,14 @@ def int_to_vector(num, fmt="!H"):
     return "%s%s" % (struct.pack(fmt, len(num_str)), num_str)
 
 
-def str_to_int(str_):
-    if str_ == "":
+def str_to_int(str_):  # todo only bytes not str
+    if str_ == b"":
         return 0
-    return int(binascii.hexlify(str_.encode()), 16)
+    return int(binascii.hexlify(str_), 16)
 
 
 def ansi_str_to_point(str_):
-    if not str_.startswith("\x04"):
+    if not str_.startswith(b"\x04"):
         raise ValueError("ANSI octet string missing point prefix (0x04)")
     str_ = str_[1:]
     if len(str_) % 2 != 0:

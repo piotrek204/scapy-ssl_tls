@@ -42,14 +42,16 @@ class PKCS7Encoder(object):
 
     # @param text The padded text for which the padding is to be removed.
     # @exception ValueError Raised when the input padding is missing or corrupt.
-    def decode(self, text):
+    def decode(self, bytestring):
         """
-        Remove the PKCS#7 padding from a text string
+        Remove the PKCS#7 padding from a text bytestring.
         """
-        nl = len(text)
-        val = int(binascii.hexlify(text[-1]), 16)
+
+        val = bytestring[-1]
         if val > self.k:
             raise ValueError('Input is not padded or padding is corrupt')
+        l = len(bytestring) - val
+        return bytestring[:l]
 
 
     # @param text The text to encode.
@@ -57,9 +59,9 @@ class PKCS7Encoder(object):
         """
         Pad an input string according to PKCS#7
         """
-        return bytes(text).decode() + self.get_padding(text)
+        return text + self.get_padding(text)
 
     def get_padding(self, bytestring):
         l = len(bytestring)
         val = self.k - (l % self.k)
-        return (bytearray([val] * val)).decode()
+        return bytes([val] * val)
